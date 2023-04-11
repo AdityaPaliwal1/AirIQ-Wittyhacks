@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Gas and Distance Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div id="gas-chart-box">
+      <canvas id="gas-chart"></canvas>
+    </div>
+    <div id="distance-chart-box">
+      <canvas id="distance-chart"></canvas>
+    </div>
+    
+    <script>
+      const gasChartCanvas = document.getElementById('gas-chart');
+      const gasChartCtx = gasChartCanvas.getContext('2d');
+      let gasChart;
+      let gasData = {
+        labels: [],
+        datasets: [
+          {
+            label: 'Gas 1',
+            data: [],
+            borderColor: 'rgb(255, 99, 132)',
+            borderWidth: 1,
+            fill: false
+          },
+          {
+            label: 'Gas 2',
+            data: [],
+            borderColor: 'rgb(54, 162, 235)',
+            borderWidth: 1,
+            fill: false
+          },
+          {
+            label: 'Gas 3',
+            data: [],
+            borderColor: 'rgb(255, 205, 86)',
+            borderWidth: 1,
+            fill: false
+          }
+        ]
+      };
+
+      function updateGasChart() {
+        fetch('https://airiq.ashutosh7i.repl.co/old')
+          .then(response => response.text())
+          .then(text => {
+            console.log(text);
+            const json = JSON.parse(text);
+            const timestamp = new Date().toLocaleTimeString();
+            const gas1 = json.data[0].gas1;
+            const gas2 = json.data[0].gas2;
+            const gas3 = json.data[0].gas3;
+            gasData.labels.push(timestamp);
+            gasData.datasets[0].data.push(gas1);
+            gasData.datasets[1].data.push(gas2);
+            gasData.datasets[2].data.push(gas3);
+            gasChart.update();
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      }
+      
+      function createGasChart() {
+        gasChart = new Chart(gasChartCtx, {
+          type: 'line',
+          data: gasData,
+          options: {
+            responsive: true,
+            scales: {
+              xAxes: [{
+                type: 'time',
+                time: {
+                  unit: 'second'
+                }
+              }],
+              yAxes: [{
+                ticks: {
+                  beginAtZero: true
+                }
+              }]
+            }
+          }
+        });
+      }
+      
+      createGasChart();
+      setInterval(updateGasChart, 2000);
+    </script>
+  </body>
+</html>

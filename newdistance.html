@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Distance Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      #distance-chart-box {
+        width: 400px;
+        height: 200px;
+        margin: 50px auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="distance-chart-box">
+      <canvas id="distance-chart"></canvas>
+    </div>
+    <script>
+        const distanceChartCanvas = document.getElementById('distance-chart');
+        const distanceChartCtx = distanceChartCanvas.getContext('2d');
+      
+        // Define the initial data for the chart
+        const data = {
+          labels: ['Distance'],
+          datasets: [{
+            data: [0],
+            backgroundColor: 'rgba(0, 128, 255, 0.5)',
+            borderWidth: 1,
+            borderColor: 'rgba(0, 128, 255, 1)'
+          }]
+        };
+      
+        // Define the chart options
+        const options = {
+          responsive: false,
+          scales: {
+            yAxes: [{
+              ticks: {
+                min: 0,
+                max: 100,
+                stepSize: 10
+              },
+              gridLines: {
+                color: 'rgba(255, 255, 255, 0.2)'
+              }
+            }],
+            xAxes: [{
+              ticks: {
+                display: false
+              },
+              gridLines: {
+                display: false
+              }
+            }]
+          },
+          animation: {
+            duration: 0
+          },
+          hover: {
+            animationDuration: 0
+          },
+          responsiveAnimationDuration: 0
+        };
+      
+        // Create the distance chart
+        const distanceChart = new Chart(distanceChartCtx, {
+          type: 'bar',
+          data: data,
+          options: options
+        });
+      
+        // Function to update the distance chart with new data
+        function updateDistanceChart(distance) {
+          distanceChart.data.datasets[0].data[0] = distance;
+          distanceChart.update();
+        }
+      
+        // Sample function to update the chart with random data every 1 second
+        setInterval(() => {
+          const distance = Math.floor(Math.random() * 101);
+          updateDistanceChart(distance);
+        }, 1000);
+      </script>
+  </body>
+</html>
