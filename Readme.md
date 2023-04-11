@@ -1,4 +1,4 @@
-# 👋 Welcome to our project, AirIQ!
+# 👋 Welcome to our project, [AirIQ(airiq.us)]
 Waste has Physical Existence and it requires hardware for detection. Here Geeks.js presents a fantastic solution using IOT.
 
 # 🔍 Purpose of Project:
