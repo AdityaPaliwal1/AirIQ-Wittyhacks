@@ -1,10 +1,188 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+
+<head>
     <meta charset="UTF-8">
-    <title>Live Data Chart</title>
-  </head>
-  <body>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirIQ</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <nav
+        class="flex sticky top-0 z-20 bg-white shadow-sm shadow-gray-300 justify-between items-center px-5 font-medium py-1 md:justify-evenly md:py-2">
+        <a href="" class="flex items-center text-[#6232e6]">
+            <img src="./sky.png" alt="" class='w-10' />
+            <span class='text-lg mx-2'>AirIQ</span>
+        </a>
+        <div class="md:flex md:items-center">
+            <ul class='flex items-center space-x-2 lg:space-x-2 text-[#815fe2] font-normal text-base'>
+                <li><a href="./index.html" class='px-5 py-2 my-1 text-md'>Dashboard</a></li>
+                <li><a href="./about.html" class='px-5 py-2 my-1 text-md'>About Us</a></li>
+                <li><a href="./howitworks.html" class='px-5 py-2 my-1 text-md'>How it works</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <h1 class="w-3/5 block m-aut
+    o text-4xl my-4 text-center font-semibold text-[#815fe2]">Realtime Live Data</h1>
     
-  </body>
+    <div class="flex items-center justify-center w-10/12 m-auto mt-24">
+        <div id="gas-chart-box" class="w-3/5 mx-4">
+            <canvas id="gas-chart"></canvas>
+        </div>
+        <div id="distance-chart-box" class="w-2/5 mx-4">
+            <canvas id="distance-chart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const gasChartCanvas = document.getElementById('gas-chart');
+        const gasChartCtx = gasChartCanvas.getContext('2d');
+        let gasChart;
+        let gasData = {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Methane',
+                    data: [],
+                    borderColor: 'rgb(255, 99, 132)',
+                    borderWidth: 1,
+                    fill: true
+                },
+                {
+                    label: 'Carbon',
+                    data: [],
+                    borderColor: 'rgb(54, 162, 235)',
+                    borderWidth: 1,
+                    fill: true
+                },
+                {
+                    label: 'Quality',
+                    data: [],
+                    borderColor: 'rgb(255, 205, 86)',
+                    borderWidth: 1,
+                    fill: true
+                }
+            ]
+        };
+
+        function updateGasChart() {
+            fetch('https://airiq.ashutosh7i.repl.co/old')
+                .then(response => response.text())
+                .then(text => {
+                    console.log(text);
+                    const json = JSON.parse(text);
+                    const timestamp = new Date().toLocaleTimeString();
+                    const gas1 = json.data[0].gas1;
+                    const gas2 = json.data[0].gas2;
+                    const gas3 = json.data[0].gas3;
+                    gasData.labels.push(timestamp);
+                    gasData.datasets[0].data.push(gas1);
+                    gasData.datasets[1].data.push(gas2);
+                    gasData.datasets[2].data.push(gas3);
+                    gasChart.update();
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+
+        function createGasChart() {
+            gasChart = new Chart(gasChartCtx, {
+                type: 'line',
+                data: gasData,
+                options: {
+                    responsive: true,
+                    scales: {
+                        xAxes: [{
+                            type: 'time',
+                            time: {
+                                unit: 'second'
+                            }
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+
+        createGasChart();
+        setInterval(updateGasChart, 2000);
+
+
+        // for distance graph 
+        const distanceChartCanvas = document.getElementById('distance-chart');
+        const distanceChartCtx = distanceChartCanvas.getContext('2d');
+
+        // Define the initial data for the chart
+        const data = {
+            labels: ['Distance'],
+            datasets: [{
+                data: [0],
+                backgroundColor: 'rgba(0, 128, 255, 0.5)',
+                borderWidth: 1,
+                borderColor: 'rgba(0, 128, 255, 1)'
+            }]
+        };
+
+        // Define the chart options
+        const options = {
+            responsive: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        min: 0,
+                        max: 100,
+                        stepSize: 10
+                    },
+                    gridLines: {
+                        color: 'rgba(255, 255, 255, 0.2)'
+                    }
+                }],
+                xAxes: [{
+                    ticks: {
+                        display: false
+                    },
+                    gridLines: {
+                        display: false
+                    }
+                }]
+            },
+            animation: {
+                duration: 0
+            },
+            hover: {
+                animationDuration: 0
+            },
+            responsiveAnimationDuration: 0
+        };
+
+        // Create the distance chart
+        const distanceChart = new Chart(distanceChartCtx, {
+            type: 'bar',
+            data: data,
+            options: options
+        });
+
+        // Function to update the distance chart with new data
+        function updateDistanceChart(distance) {
+            distanceChart.data.datasets[0].data[0] = distance;
+            distanceChart.update();
+        }
+
+        // Sample function to update the chart with random data every 1 second
+        setInterval(() => {
+            const distance = Math.floor(Math.random() * 101);
+            updateDistanceChart(distance);
+        }, 1000);
+    </script>
+</body>
+
 </html>
